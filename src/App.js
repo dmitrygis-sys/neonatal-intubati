@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { T } from './tokens';
-import { ProtocolTab, AnatomyTab, ScenariosTab, AITab } from './Tabs';
+import { ProtocolTab, AnatomyTab, ScenariosTab, AITab, VisualizationTab } from './Tabs';
 
 const TABS = [
-  { id: "guide",     label: "📋 Протокол" },
-  { id: "anatomy",   label: "🫁 Анатомия" },
-  { id: "scenarios", label: "⚡ Сценарии" },
-  { id: "ai",        label: "🤖 ИИ-консультант" },
+  { id: "guide",         label: "📋 Протокол" },
+  { id: "anatomy",       label: "🫁 Анатомия" },
+  { id: "visualization", label: "👁 Визуализация" },
+  { id: "scenarios",     label: "⚡ Сценарии" },
+  { id: "ai",            label: "🤖 ИИ-консультант" },
 ];
 
 export default function App() {
@@ -52,10 +53,11 @@ export default function App() {
       </div>
 
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "24px 16px 56px" }}>
-        {activeTab === "guide"     && <ProtocolTab/>}
-        {activeTab === "anatomy"   && <AnatomyTab/>}
-        {activeTab === "scenarios" && <ScenariosTab/>}
-        {activeTab === "ai"        && <AITab/>}
+        {activeTab === "guide"         && <ProtocolTab/>}
+        {activeTab === "anatomy"       && <AnatomyTab/>}
+        {activeTab === "visualization" && <VisualizationTab/>}
+        {activeTab === "scenarios"     && <ScenariosTab/>}
+        {activeTab === "ai"            && <AITab/>}
       </div>
 
       <div style={{ background: T.navy, color: "#6B8BA4", textAlign: "center", padding: 16, fontSize: 11 }}>
