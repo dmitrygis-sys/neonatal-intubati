@@ -171,14 +171,22 @@ export function ScenariosTab() {
     const picked = SCENARIO_TYPES[Math.floor(Math.random() * SCENARIO_TYPES.length)];
     try {
       const data = await callClaude({
-        model: "claude-sonnet-4-6", max_tokens: 1000,
-        system: `Ты создаёшь клинические сценарии для обучения врачей-неонатологов. Отвечай ТОЛЬКО в формате JSON без markdown. Структура: {"situation":"...","vitals":{"SpO2":"...","HR":"...","RR":"...","weight":"..."},"urgency":"критическая|высокая|средняя","question":"Ваши действия?","answer":"...","pitfalls":["...","..."]}`,
-        messages: [{ role: "user", content: `Создай клинический сценарий: ${picked}` }],
+        model: "claude-sonnet-4-6", max_tokens: 1200,
+        system: `Ты создаёшь клинические сценарии для обучения врачей-неонатологов. 
+Отвечай ТОЛЬКО валидным JSON без каких-либо пояснений, markdown, блоков кода или текста до/после JSON.
+Структура ответа:
+{"situation":"текст ситуации","vitals":{"SpO2":"значение","HR":"значение","RR":"значение","weight":"значение"},"urgency":"критическая","question":"Ваши действия?","answer":"подробный разбор","pitfalls":["ошибка 1","ошибка 2"]}`,
+        messages: [{ role: "user", content: `Создай клинический сценарий: ${picked}. Ответь только JSON.` }],
       });
-      const text = data.content?.[0]?.text || "{}";
-      setScenario(JSON.parse(text.replace(/```json|```/g, "").trim()));
-    } catch {
-      setScenario({ situation: "Ошибка генерации. Проверьте ANTHROPIC_API_KEY в настройках Vercel.", vitals: {}, urgency: "средняя", question: "", answer: "", pitfalls: [] });
+      const text = data.content?.[0]?.text || "";
+      const match = text.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error("JSON не найден в ответе");
+      setScenario(JSON.parse(match[0]));
+    } catch (err) {
+      setScenario({
+        situation: `Ошибка генерации: ${err.message}. Попробуйте ещё раз.`,
+        vitals: {}, urgency: "средняя", question: "", answer: "", pitfalls: []
+      });
     } finally { setLoading(false); }
   }
 
