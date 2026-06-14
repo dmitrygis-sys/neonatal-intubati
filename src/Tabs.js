@@ -180,8 +180,19 @@ export function ScenariosTab() {
       });
       const text = data.content?.[0]?.text || "";
       const match = text.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error("JSON не найден в ответе");
-      setScenario(JSON.parse(match[0]));
+if (!match) throw new Error("JSON не найден в ответе");
+let parsed;
+try {
+  parsed = JSON.parse(match[0]);
+} catch {
+  // Попытка починить битый JSON — убираем управляющие символы
+  const cleaned = match[0]
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/,\s*}/g, "}")
+    .replace(/,\s*]/g, "]");
+  parsed = JSON.parse(cleaned);
+}
+setScenario(parsed);
     } catch (err) {
       setScenario({
         situation: `Ошибка генерации: ${err.message}. Попробуйте ещё раз.`,
