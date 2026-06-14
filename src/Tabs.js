@@ -173,29 +173,22 @@ export function ScenariosTab() {
       const data = await callClaude({
         model: "claude-sonnet-4-6", max_tokens: 1200,
         system: `Ты создаёшь клинические сценарии для обучения врачей-неонатологов. 
-Отвечай ТОЛЬКО валидным JSON без каких-либо пояснений, markdown, блоков кода или текста до/после JSON.
-Структура ответа:
-{"situation":"текст ситуации","vitals":{"SpO2":"значение","HR":"значение","RR":"значение","weight":"значение"},"urgency":"критическая","question":"Ваши действия?","answer":"подробный разбор","pitfalls":["ошибка 1","ошибка 2"]}`,
-        messages: [{ role: "user", content: `Создай клинический сценарий: ${picked}. Ответь только JSON.` }],
+Отвечай ТОЛЬКО валидным JSON. Никакого markdown, никаких блоков кода, никакого текста кроме JSON.
+Все строки в JSON должны быть в одну строку без переносов.
+Структура: {"situation":"...","vitals":{"SpO2":"...","HR":"...","RR":"...","weight":"..."},"urgency":"критическая","question":"Ваши действия?","answer":"...","pitfalls":["...","..."]}`,
+        messages: [{ role: "user", content: `Сценарий: ${picked}. Только JSON одной строкой.` }],
       });
       const text = data.content?.[0]?.text || "";
       const match = text.match(/\{[\s\S]*\}/);
-if (!match) throw new Error("JSON не найден в ответе");
-let parsed;
-try {
-  parsed = JSON.parse(match[0]);
-} catch {
-  // Попытка починить битый JSON — убираем управляющие символы
-  const cleaned = match[0]
-    .replace(/[\u0000-\u001F\u007F]/g, " ")
-    .replace(/,\s*}/g, "}")
-    .replace(/,\s*]/g, "]");
-  parsed = JSON.parse(cleaned);
-}
-setScenario(parsed);
+      if (!match) throw new Error("JSON не найден");
+      const cleaned = match[0]
+        .replace(/[\u0000-\u001F\u007F]/g, m => m === '\n' || m === '\r' ? ' ' : '')
+        .replace(/,\s*}/g, '}')
+        .replace(/,\s*]/g, ']');
+      setScenario(JSON.parse(cleaned));
     } catch (err) {
       setScenario({
-        situation: `Ошибка генерации: ${err.message}. Попробуйте ещё раз.`,
+        situation: `Ошибка: ${err.message}. Нажмите ещё раз — обычно помогает.`,
         vitals: {}, urgency: "средняя", question: "", answer: "", pitfalls: []
       });
     } finally { setLoading(false); }
