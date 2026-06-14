@@ -63,14 +63,11 @@ export function ProtocolTab() {
             <div style={{ fontSize: 10, color: T.slate }}>выполнено</div>
           </div>
         </div>
-
         <p style={{ margin: "0 0 16px", color: T.slate, lineHeight: 1.75, fontSize: 14 }}>{step.content}</p>
-
         <div style={{ background: "rgba(255,255,255,0.8)", borderLeft: `4px solid ${step.borderColor}`, borderRadius: 8, padding: "10px 14px", marginBottom: 16 }}>
           <div style={{ fontSize: 11, fontWeight: 800, color: step.borderColor, letterSpacing: 1, marginBottom: 4 }}>💡 КЛИНИЧЕСКИЙ СОВЕТ</div>
           <div style={{ fontSize: 13, color: T.navy, lineHeight: 1.65 }}>{step.tip}</div>
         </div>
-
         <div style={{ background: T.white, borderRadius: 10, padding: 14 }}>
           <div style={{ fontSize: 12, fontWeight: 800, color: T.navy, marginBottom: 10, letterSpacing: 1 }}>✓ КОНТРОЛЬНЫЙ СПИСОК</div>
           {step.checklist.map(item => {
@@ -148,6 +145,291 @@ export function AnatomyTab() {
             ))}
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ── VISUALIZATION TAB ─────────────────────────────────────────────────
+function GlottisViewSVG({ type }) {
+  // type: "ideal" | "partial" | "none" | "esophagus"
+  const configs = {
+    ideal: {
+      label: "Идеальная картина",
+      labelColor: T.green,
+      bg: "#1a1a2e",
+      elements: (
+        <>
+          <ellipse cx="100" cy="100" rx="75" ry="65" fill="#2d1b1b" stroke="#555" strokeWidth="1"/>
+          <ellipse cx="100" cy="85" rx="45" ry="35" fill="#3d2b2b"/>
+          <path d="M70 75 L100 95 L130 75" fill="#8B6914" stroke="#6B4F10" strokeWidth="1.5"/>
+          <line x1="72" y1="88" x2="128" y2="82" stroke="#F0E6C8" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="72" y1="100" x2="128" y2="106" stroke="#F0E6C8" strokeWidth="3" strokeLinecap="round"/>
+          <path d="M72 88 L72 100" stroke="#F0E6C8" strokeWidth="2"/>
+          <path d="M128 82 L128 106" stroke="#F0E6C8" strokeWidth="2"/>
+          <path d="M72 94 L85 100 L100 115 L115 100 L128 94" fill="#111" stroke="none"/>
+          <ellipse cx="100" cy="112" rx="12" ry="8" fill="#111"/>
+          <text x="100" y="155" textAnchor="middle" fontSize="11" fill={T.green} fontFamily="sans-serif" fontWeight="800">✓ Голосовая щель чётко видна</text>
+          <text x="100" y="170" textAnchor="middle" fontSize="10" fill="#aaa" fontFamily="sans-serif">Тёмный треугольник между связками</text>
+        </>
+      )
+    },
+    partial: {
+      label: "Частичная видимость",
+      labelColor: T.amber,
+      bg: "#1a1a2e",
+      elements: (
+        <>
+          <ellipse cx="100" cy="100" rx="75" ry="65" fill="#2d1b1b" stroke="#555" strokeWidth="1"/>
+          <ellipse cx="100" cy="110" rx="50" ry="30" fill="#4a3000" stroke="#6B4F10" strokeWidth="1.5"/>
+          <path d="M60 85 Q100 70 140 85 L140 95 Q100 80 60 95 Z" fill="#8B6914"/>
+          <line x1="85" y1="95" x2="130" y2="90" stroke="#F0E6C8" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="90" y1="105" x2="132" y2="102" stroke="#F0E6C8" strokeWidth="2.5" strokeLinecap="round"/>
+          <text x="100" y="155" textAnchor="middle" fontSize="11" fill={T.amber} fontFamily="sans-serif" fontWeight="800">⚠ Виден только край связок</text>
+          <text x="100" y="170" textAnchor="middle" fontSize="10" fill="#aaa" fontFamily="sans-serif">Применить BURP-манёвр</text>
+        </>
+      )
+    },
+    none: {
+      label: "Связки не видны",
+      labelColor: T.danger,
+      bg: "#1a1a2e",
+      elements: (
+        <>
+          <ellipse cx="100" cy="100" rx="75" ry="65" fill="#2d1b1b" stroke="#555" strokeWidth="1"/>
+          <ellipse cx="100" cy="115" rx="55" ry="28" fill="#5a3500" stroke="#7a4500" strokeWidth="1.5"/>
+          <path d="M45 80 Q100 60 155 80 L155 92 Q100 72 45 92 Z" fill="#8B5E14"/>
+          <path d="M45 92 Q100 85 155 92" fill="none" stroke="#6B4510" strokeWidth="2"/>
+          <text x="100" y="155" textAnchor="middle" fontSize="11" fill={T.danger} fontFamily="sans-serif" fontWeight="800">✗ Связки не видны</text>
+          <text x="100" y="170" textAnchor="middle" fontSize="10" fill="#aaa" fontFamily="sans-serif">Извлечь, вентилировать маской</text>
+        </>
+      )
+    },
+    esophagus: {
+      label: "Пищевод (ошибка!)",
+      labelColor: T.danger,
+      bg: "#1a1a2e",
+      elements: (
+        <>
+          <ellipse cx="100" cy="100" rx="75" ry="65" fill="#2d1b1b" stroke="#555" strokeWidth="1"/>
+          <ellipse cx="100" cy="100" rx="30" ry="25" fill="#6B2020" stroke="#8B3030" strokeWidth="2"/>
+          <ellipse cx="100" cy="100" rx="18" ry="14" fill="#3d0000"/>
+          <path d="M88 90 Q100 100 88 110" fill="none" stroke="#8B3030" strokeWidth="1.5"/>
+          <path d="M112 90 Q100 100 112 110" fill="none" stroke="#8B3030" strokeWidth="1.5"/>
+          <text x="100" y="155" textAnchor="middle" fontSize="11" fill={T.danger} fontFamily="sans-serif" fontWeight="800">✗ Пищевод — круглое отверстие</text>
+          <text x="100" y="170" textAnchor="middle" fontSize="10" fill="#aaa" fontFamily="sans-serif">Нет белых связок, форма круглая</text>
+        </>
+      )
+    },
+  };
+  const c = configs[type];
+  return (
+    <svg viewBox="0 0 200 185" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", maxWidth: 200 }}>
+      <rect width="200" height="185" rx="10" fill={c.bg}/>
+      {c.elements}
+    </svg>
+  );
+}
+
+function BURPManeuverSVG() {
+  return (
+    <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", maxWidth: 320 }}>
+      <text x="160" y="18" textAnchor="middle" fontSize="13" fontWeight="900" fill={T.navy} fontFamily="sans-serif">
+        BURP-манёвр
+      </text>
+      {[
+        { x: 20, label: "B", desc: "Backward", sub: "Назад", color: "#E8F4FD" },
+        { x: 100, label: "U", desc: "Upward", sub: "Вверх", color: "#EDF7F6" },
+        { x: 180, label: "R", desc: "Rightward", sub: "Вправо", color: "#FEF3E2" },
+        { x: 260, label: "P", desc: "Pressure", sub: "Давление", color: "#EDF7EF" },
+      ].map(item => (
+        <g key={item.label} transform={`translate(${item.x}, 30)`}>
+          <rect width="75" height="110" rx="8" fill={item.color} stroke="#E2E8F0" strokeWidth="1"/>
+          <text x="37" y="38" textAnchor="middle" fontSize="28" fontWeight="900" fill={T.teal} fontFamily="sans-serif">{item.label}</text>
+          <text x="37" y="60" textAnchor="middle" fontSize="10" fontWeight="700" fill={T.navy} fontFamily="sans-serif">{item.desc}</text>
+          <text x="37" y="78" textAnchor="middle" fontSize="11" fontWeight="800" fill={T.slate} fontFamily="sans-serif">{item.sub}</text>
+          <text x="37" y="100" textAnchor="middle" fontSize="9" fill={T.slate} fontFamily="sans-serif">щитовидного</text>
+          <text x="37" y="113" textAnchor="middle" fontSize="9" fill={T.slate} fontFamily="sans-serif">хряща</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function ConfirmationWithoutCO2SVG() {
+  const methods = [
+    { icon: "👁", title: "Прямой контроль", desc: "Трубка прошла через голосовые связки под визуальным контролем — главный критерий", priority: "1", color: "#EDF7F6", border: T.teal },
+    { icon: "🫁", title: "Экскурсия грудной клетки", desc: "Симметричный подъём при вентиляции. Живот НЕ раздувается", priority: "2", color: "#E8F4FD", border: T.teal },
+    { icon: "🩺", title: "Аускультация", desc: "Дыхание над обоими лёгкими одинаково. Над эпигастрием — тишина", priority: "3", color: "#FEF3E2", border: T.amber },
+    { icon: "📈", title: "SpO₂ и ЧСС", desc: "SpO₂ нарастает, ЧСС >100 уд/мин и стабилизируется в течение 30–60 сек", priority: "4", color: "#EDF7EF", border: T.green },
+    { icon: "🌫", title: "Запотевание трубки", desc: "Конденсат на стенках ЭТТ при выдохе. Признак ненадёжный — возможен и при пищеводной интубации", priority: "5", color: "#F3F0FA", border: "#7B5EA7" },
+    { icon: "📸", title: "Рентген ОГК", desc: "Кончик ЭТТ на уровне Th2–Th3. Обязателен после стабилизации", priority: "✓", color: "#EDF7F6", border: T.teal },
+  ];
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+      {methods.map(m => (
+        <div key={m.title} style={{ background: m.color, border: `2px solid ${m.border}`, borderRadius: 12, padding: 14, display: "flex", gap: 12, alignItems: "flex-start" }}>
+          <div style={{ fontSize: 28, flexShrink: 0 }}>{m.icon}</div>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span style={{ background: m.border, color: T.white, borderRadius: 20, padding: "1px 8px", fontSize: 10, fontWeight: 800 }}>{m.priority}</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: T.navy }}>{m.title}</span>
+            </div>
+            <div style={{ fontSize: 12, color: T.slate, lineHeight: 1.55 }}>{m.desc}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function VisualizationTab() {
+  const [activeView, setActiveView] = useState("ideal");
+  const views = [
+    { id: "ideal",     label: "✓ Идеально" },
+    { id: "partial",   label: "⚠ Частично" },
+    { id: "none",      label: "✗ Не видно" },
+    { id: "esophagus", label: "✗ Пищевод" },
+  ];
+
+  return (
+    <div>
+      {/* Hero */}
+      <div style={{ background: T.navy, borderRadius: 14, padding: 22, marginBottom: 20, color: T.white }}>
+        <h2 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 900 }}>👁 Визуализация голосовых связок</h2>
+        <p style={{ margin: 0, color: "#A8C4D8", fontSize: 13, lineHeight: 1.6 }}>
+          Ключевой навык интубации. Трубка вводится ТОЛЬКО под прямым визуальным контролем прохождения через голосовую щель. Никаких вслепую.
+        </p>
+      </div>
+
+      {/* Laryngoscope view simulator */}
+      <div style={{ background: T.white, borderRadius: 14, padding: 20, marginBottom: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
+        <h3 style={{ margin: "0 0 14px", color: T.navy, fontSize: 15, fontWeight: 800 }}>
+          🔭 Картина в ларингоскопе — что вы видите?
+        </h3>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+          {views.map(v => (
+            <button key={v.id} onClick={() => setActiveView(v.id)}
+              style={{
+                background: activeView === v.id ? T.teal : T.cream,
+                color: activeView === v.id ? T.white : T.navy,
+                border: `2px solid ${activeView === v.id ? T.teal : "#CBD5E0"}`,
+                borderRadius: 8, padding: "8px 14px", cursor: "pointer",
+                fontWeight: 700, fontSize: 13,
+              }}>{v.label}</button>
+          ))}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
+          <GlottisViewSVG type={activeView}/>
+          <div>
+            {activeView === "ideal" && (
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: T.green, marginBottom: 8 }}>✓ Действие: вводите трубку</div>
+                <div style={{ fontSize: 12, color: T.slate, lineHeight: 1.7 }}>
+                  • Две белые струны — голосовые связки<br/>
+                  • Тёмный треугольник между ними — голосовая щель<br/>
+                  • Вводите ЭТТ строго через треугольник<br/>
+                  • Следите за меткой vocal cord guide<br/>
+                  • Чёрная полоска должна скрыться за связками
+                </div>
+              </div>
+            )}
+            {activeView === "partial" && (
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: T.amber, marginBottom: 8 }}>⚠ Действие: улучшите визуализацию</div>
+                <div style={{ fontSize: 12, color: T.slate, lineHeight: 1.7 }}>
+                  • Попросите ассистента: BURP-манёвр<br/>
+                  • Слегка отведите клинок назад<br/>
+                  • Проверьте положение головы<br/>
+                  • Если улучшилось — вводите трубку<br/>
+                  • Если нет — извлекайте, вентилируйте маской
+                </div>
+              </div>
+            )}
+            {activeView === "none" && (
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: T.danger, marginBottom: 8 }}>✗ Действие: НЕ вводите трубку</div>
+                <div style={{ fontSize: 12, color: T.slate, lineHeight: 1.7 }}>
+                  • Немедленно извлеките ларингоскоп<br/>
+                  • Вентилируйте маской 30–60 секунд<br/>
+                  • Переоцените положение головы<br/>
+                  • Смените размер клинка если нужно<br/>
+                  • Повторная попытка — максимум 30 сек<br/>
+                  • После 3 неудач — вызов помощи
+                </div>
+              </div>
+            )}
+            {activeView === "esophagus" && (
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: T.danger, marginBottom: 8 }}>✗ Признаки интубации пищевода</div>
+                <div style={{ fontSize: 12, color: T.slate, lineHeight: 1.7 }}>
+                  • Круглое отверстие без белых связок<br/>
+                  • Живот раздувается при вентиляции<br/>
+                  • SpO₂ падает, ЧСС снижается<br/>
+                  • Дыхание над лёгкими не выслушивается<br/>
+                  <br/>
+                  <strong style={{ color: T.danger }}>Немедленно извлеките трубку!</strong><br/>
+                  Вентилируйте маской до восстановления SpO₂
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Anatomy detail */}
+      <div style={{ background: T.white, borderRadius: 14, padding: 20, marginBottom: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
+        <h3 style={{ margin: "0 0 14px", color: T.navy, fontSize: 15, fontWeight: 800 }}>
+          🔬 Анатомия гортани новорождённого — что искать
+        </h3>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
+          {[
+            { title: "Надгортанник", desc: "Омегообразный (Ω), бледно-розовый. Клинок Миллера подводится ПОД него и приподнимает. Это открывает вид на связки.", icon: "1️⃣", color: "#E8F4FD" },
+            { title: "Голосовые связки", desc: "Две белые/перламутровые струны. У новорождённых бледнее чем у взрослых. Между ними — тёмный треугольник (глотис).", icon: "2️⃣", color: "#EDF7F6" },
+            { title: "Голосовая щель", desc: "Тёмный треугольный просвет между связками. Именно сюда вводится трубка. В норме — треугольная форма.", icon: "3️⃣", color: "#FEF3E2" },
+            { title: "Черпаловидные хрящи", desc: "Два бугорка позади связок. Ориентир — трубка проходит между ними. Помогают определить заднюю комиссуру.", icon: "4️⃣", color: "#EDF7EF" },
+          ].map(item => (
+            <div key={item.title} style={{ background: item.color, borderRadius: 10, padding: 14 }}>
+              <div style={{ fontSize: 20, marginBottom: 6 }}>{item.icon}</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: T.navy, marginBottom: 6 }}>{item.title}</div>
+              <div style={{ fontSize: 12, color: T.slate, lineHeight: 1.55 }}>{item.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* BURP */}
+      <div style={{ background: T.white, borderRadius: 14, padding: 20, marginBottom: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
+        <h3 style={{ margin: "0 0 4px", color: T.navy, fontSize: 15, fontWeight: 800 }}>🖐 BURP-манёвр при плохой визуализации</h3>
+        <p style={{ margin: "0 0 14px", fontSize: 12, color: T.slate }}>
+          Ассистент оказывает внешнее давление на щитовидный хрящ по команде интубирующего врача
+        </p>
+        <BURPManeuverSVG/>
+        <div style={{ marginTop: 14, background: "#FFF8E7", border: `2px solid ${T.amber}`, borderRadius: 10, padding: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: T.amber, marginBottom: 6 }}>⚠️ ВАЖНО</div>
+          <div style={{ fontSize: 12, color: T.navy, lineHeight: 1.6 }}>
+            BURP отличается от приёма Селлика. Селлик — давление на перстневидный хрящ для предотвращения регургитации.
+            BURP — давление на <strong>щитовидный хрящ</strong> для улучшения визуализации гортани.
+          </div>
+        </div>
+      </div>
+
+      {/* Confirmation without CO2 */}
+      <div style={{ background: T.white, borderRadius: 14, padding: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
+        <h3 style={{ margin: "0 0 4px", color: T.navy, fontSize: 15, fontWeight: 800 }}>
+          🚫 Подтверждение положения ЭТТ без CO₂-детектора
+        </h3>
+        <p style={{ margin: "0 0 14px", fontSize: 12, color: T.slate }}>
+          При отсутствии капнографии используйте комплекс клинических признаков. Ни один из них сам по себе не является абсолютным.
+        </p>
+        <ConfirmationWithoutCO2SVG/>
+        <div style={{ marginTop: 14, background: "#FFF0F0", border: `2px solid ${T.danger}`, borderRadius: 10, padding: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: T.danger, marginBottom: 6 }}>🚨 ПРИЗНАКИ НЕПРАВИЛЬНОГО ПОЛОЖЕНИЯ</div>
+          <div style={{ fontSize: 12, color: T.navy, lineHeight: 1.6 }}>
+            Живот раздувается · SpO₂ падает · ЧСС снижается · Дыхание над лёгкими не выслушивается · Отсутствие экскурсии грудной клетки
+            <br/><strong>→ Немедленно извлеките трубку и вентилируйте маской!</strong>
+          </div>
+        </div>
       </div>
     </div>
   );
