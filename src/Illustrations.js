@@ -99,4 +99,8 @@ export function DepthSVG() {
       <text x="24" y="65" fontSize="10" fill={T.slate} fontFamily="sans-serif">* для орально введённой трубки у доношенных</text>
       <rect x="12" y="82" width="295" height="72" rx="8" fill="#FFF3DC" stroke={T.amber} strokeWidth="1.5"/>
       <text x="24" y="103" fontSize="11" fontWeight="700" fill={T.navy} fontFamily="sans-serif">Контрольные точки:</text>
-      <text x="24" y="122" fontSize="11" fill
+      <text x="24" y="122" fontSize="11" fill={T.slate} fontFamily="sans-serif">• 1 кг → 7 см  |  2 кг → 8 см  |  3 кг → 9 см  |  4 кг → 10 см</text>
+      <text x="24" y="142" fontSize="10" fill={T.slate} fontFamily="sans-serif">• Правило «1-2-3 = 7-8-9» удобно запомнить в родзале</text>
+    </svg>
+  );
+}
